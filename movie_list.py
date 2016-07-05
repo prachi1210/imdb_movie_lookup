@@ -42,20 +42,20 @@ def get_info(id):
         genre.append(d['Genre'])
         plot.append(d['Plot'])
         ratings.append(d['imdbRating'])
-        
+      
 def main():
+    i=0
     filepath = raw_input("Enter path")
     for file in os.listdir(filepath):
         print(file)   
         get_info(get_imdb_id(file))
         movie_names.append(file)
+        if(i>=35):
+            break
+        i+=1
         
     df = pd.DataFrame({'Movie Name': movie_names , ' Genre': genre, 'Plot': plot, 'Ratings': ratings})
     df.to_excel('movies.xls', sheet_name='movies', index=False)
 
 if __name__ == "__main__":
     main()
-    
-    
-
-
