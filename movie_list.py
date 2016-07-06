@@ -2,10 +2,11 @@ import urllib
 from urllib2 import Request, urlopen, URLError
 import json
 import pandas as pd
-import glob, os
+import os
 import requests
 from lxml import html
 
+movie_names = []
 genre = []
 plot = []
 ratings = []
@@ -16,9 +17,12 @@ def get_imdb_id(input):
     url = "http://www.imdb.com/find?ref_=nv_sr_fn&q="+query+"&s=all"
     page = requests.get(url)
     tree = html.fromstring(page.content)
-    imdb_id=(tree.xpath('//td[@class="result_text"]//a')[0].get('href'))
-    imdb_id = imdb_id.replace('/title/','')
-    imdb_id = imdb_id.replace('/?ref_=fn_al_tt_1','')
+    if"No results" in (tree.xpath('//h1[@class="findHeader"]/text()')[0]):
+        imdb_id = "tt00000"
+    else:
+        imdb_id=(tree.xpath('//td[@class="result_text"]//a')[0].get('href'))
+        imdb_id = imdb_id.replace('/title/','')
+        imdb_id = imdb_id.replace('/?ref_=fn_al_tt_1','')
     return (imdb_id)
 
 def get_info(id):  
@@ -38,12 +42,12 @@ def get_info(id):
         plot.append(d['Plot'])
         ratings.append(d['imdbRating'])
 
-   
-get_info(get_imdb_id('toy story'))
-
-
+for file in os.listdir("H:\DS LAB\Movies - aloo"):
+    print(file)   
+    get_info(get_imdb_id(file))
+    movie_names.append(file)
+    
 df = pd.DataFrame({'Genre': genre, 'Plot': plot, 'Ratings': ratings})
-
 df.to_excel('movies.xls', sheet_name='sheet1', index=False)
     
 
